@@ -14,7 +14,9 @@ export function generateCaptcha(options: CaptchaOptions): CaptchaResult {
   let resultChars: string[] = [];
   let answer: string | number;
   let question: string | undefined;
-  let width = 200;
+  
+  let width = options.width ?? 200;
+  let height = options.height ?? 70;
 
   switch (options.type) {
     case 'math': {
@@ -34,7 +36,7 @@ export function generateCaptcha(options: CaptchaOptions): CaptchaResult {
       resultChars = logicRes.chars;
       answer = logicRes.answer;
       question = logicRes.question;
-      if (logicRes.chars.length === 6) {
+      if (logicRes.chars.length === 6 && !options.width) {
         width = 280;
       }
       break;
@@ -43,7 +45,9 @@ export function generateCaptcha(options: CaptchaOptions): CaptchaResult {
       throw new Error(`Unsupported CAPTCHA type: ${options.type}`);
   }
 
-  const svgImage = buildSvg(resultChars, difficulty, globalNoise, width, 70);
+  const isAnimated = globalNoise > 3 || difficulty > 3;
+
+  const svgImage = buildSvg(resultChars, difficulty, globalNoise, width, height, isAnimated);
 
   const meta = {
     type: options.type,

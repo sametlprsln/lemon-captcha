@@ -9,6 +9,8 @@ export interface CaptchaOptions {
   globalNoise?: GlobalNoise;
   wordPool?: string[];
   seed?: number;
+  width?: number;
+  height?: number;
 }
 
 export interface CaptchaResult {

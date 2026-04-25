@@ -27,12 +27,14 @@ console.log(captcha.answer); // e.g. 5
 console.log(captcha.image);  // "data:image/svg+xml;base64,..."
 ```
 
-### Alphanumeric CAPTCHA
+### Alphanumeric CAPTCHA (with Custom Dimensions & Animation)
 ```typescript
 const captcha = generateCaptcha({ 
   type: 'alpha', 
-  difficulty: 4, 
-  wordPool: ["HELLO", "WORLD"] 
+  difficulty: 4, // > 3 triggers native SVG character animations
+  wordPool: ["HELLO", "WORLD"],
+  width: 300,
+  height: 100
 });
 console.log(captcha.answer); // "HELLO"
 ```
@@ -54,6 +56,8 @@ console.log(captcha.answer);   // "2" (e.g., if array was [1,3,2,7,9])
 | `globalNoise`| `1 \| 2 \| 3 \| 4 \| 5` | `2` | Visual distortion & noise element density. |
 | `wordPool` | `string[]` | Built-in | Custom words for Alpha difficulty 4. |
 | `seed` | `number` | undefined | Seed for deterministic SVG output (testing). |
+| `width` | `number` | `200` | Custom width for the generated SVG (Logic level 4 defaults to 280). |
+| `height` | `number` | `70` | Custom height for the generated SVG. |
 
 ### `CaptchaResult`
 | Field | Type | Description |
@@ -73,13 +77,13 @@ console.log(captcha.answer);   // "2" (e.g., if array was [1,3,2,7,9])
 
 ## Global Noise Levels
 
-| Level | Distortion | Background Lines | Foreground Lines | Dot Count |
-|-------|------------|------------------|------------------|-----------|
-| **1** | None | 0-1 | 1-2 | 20-50 |
-| **2** | Low | 2-3 | 2-4 | 60-100 |
-| **3** | Medium | 3-5 | 3-5 | 100-150 |
-| **4** | High | 4-6 | 4-7 | 140-200 |
-| **5** | Extreme | 5-8 | 5-9 | 180-260 |
+| Level | Distortion | Background Lines | Foreground Lines | Dot Count | Animation |
+|-------|------------|------------------|------------------|-----------|-----------|
+| **1** | None | 0-1 | 1-2 | 20-50 | No |
+| **2** | Low | 2-3 | 2-4 | 60-100 | No |
+| **3** | Medium | 3-5 | 3-5 | 100-150 | No |
+| **4** | High | 4-6 | 4-7 | 140-200 | Yes |
+| **5** | Extreme | 5-8 | 5-9 | 180-260 | Yes |
 
 ## Roadmap
 - **v0.1.5**: Sound CAPTCHA support

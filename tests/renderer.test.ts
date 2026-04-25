@@ -23,4 +23,23 @@ describe('Renderer & Engine', () => {
     const res5 = generateCaptcha({ type: 'math', globalNoise: 5, seed: 123 });
     expect(res5.image.length).toBeGreaterThan(res1.image.length);
   });
+
+  it('Custom width and height are applied', () => {
+    const res = generateCaptcha({ type: 'math', width: 350, height: 120 });
+    const svgText = Buffer.from(res.image.split(',')[1], 'base64').toString('utf-8');
+    expect(svgText).toContain('width="350"');
+    expect(svgText).toContain('height="120"');
+  });
+
+  it('Adds animation for globalNoise > 3', () => {
+    const res = generateCaptcha({ type: 'math', globalNoise: 4 });
+    const svgText = Buffer.from(res.image.split(',')[1], 'base64').toString('utf-8');
+    expect(svgText).toContain('<animateTransform');
+  });
+
+  it('Does not add animation for globalNoise <= 3 and difficulty <= 3', () => {
+    const res = generateCaptcha({ type: 'math', globalNoise: 3, difficulty: 2 });
+    const svgText = Buffer.from(res.image.split(',')[1], 'base64').toString('utf-8');
+    expect(svgText).not.toContain('<animateTransform');
+  });
 });

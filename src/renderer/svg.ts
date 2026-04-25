@@ -17,7 +17,8 @@ export function buildSvg(
   difficulty: Difficulty,
   globalNoise: GlobalNoise,
   width = 200,
-  height = 70
+  height = 70,
+  animated = false
 ): string {
   const config = NOISE_CONFIG[globalNoise];
   const bgR = randInt(230, 255);
@@ -51,18 +52,15 @@ export function buildSvg(
   svg += `<rect width="100%" height="100%" fill="rgb(${bgR},${bgG},${bgB})" />`;
   
   const fakeLen = totalChars > 0 ? totalChars : 5;
-  
   svg += `<text x="-9999" y="-9999" aria-hidden="true">${generateFakeString(fakeLen)}</text>`;
-  
   svg += `<text x="${randInt(10, width - 20)}" y="${randInt(10, height - 10)}" opacity="0.0001" font-size="0.1">${generateFakeString(fakeLen + 1)}</text>`;
-  
   svg += `<text x="${randInt(10, width - 20)}" y="${randInt(10, height - 10)}" fill="transparent">${randInt(10, 99)}+${randInt(1, 9)}</text>`;
   
   const numFakePaths = randInt(4, 8);
   for (let i = 0; i < numFakePaths; i++) {
     const fx = randInt(0, width).toFixed(2);
     const fy = randInt(0, height).toFixed(2);
-    const fakePathD = `M${fx},${fy}h${randFloat(2,6).toFixed(2)}v${randFloat(2,6).toFixed(2)}h-${randFloat(2,6).toFixed(2)}Z M${(parseFloat(fx)+5).toFixed(2)},${(parseFloat(fy)+5).toFixed(2)}v${randFloat(1,5).toFixed(2)}h${randFloat(1,5).toFixed(2)}Z`;
+    const fakePathD = `M${fx},${fy}h${randFloat(2,6).toFixed(2)}v${randFloat(2,6).toFixed(2)}h-${randFloat(2,6).toFixed(2)}Z M${(parseFloat(fx)+5).toFixed(2)},${(parseFloat(fy)+5).toFixed(2)}v${randFloat(2,6).toFixed(2)}Z`;
     
     const trapStyles = [
       `opacity="0"`,
@@ -78,7 +76,7 @@ export function buildSvg(
 
   const numBgLines = randInt(config.bgLines[0], config.bgLines[1]);
   for (let i = 0; i < numBgLines; i++) {
-    svg += `<line x1="${randInt(0, width)}" y1="${randInt(0, height)}" x2="${randInt(0, width)}" y2="${randInt(0, height)}" stroke="${pickCamouflageColor()}" stroke-width="${randFloat(1, 3).toFixed(1)}" opacity="0.7" />`;
+    svg += `<line x1="${randInt(0, width)}" y1="${randInt(0, height)}" x2="${randInt(0, width)}" y2="${randInt(0, height)}" stroke="${pickCamouflageColor()}" stroke-width="${randFloat(1, 3).toFixed(1)}" opacity="${randFloat(0.3, 0.7).toFixed(2)}" />`;
   }
 
   const scale = 5.5;
@@ -117,7 +115,16 @@ export function buildSvg(
       }
       
       const d = shuffle(pathSegments).join('');
-      svg += `<path d="${d}" fill="${color}" transform="rotate(${rot}, ${cx}, ${cy})" />`;
+      
+      let animationTag = '';
+      if (animated) {
+        const dur = randFloat(1.5, 4.0).toFixed(1);
+        const transX = randFloat(-2, 2).toFixed(1);
+        const transY = randFloat(-3, 3).toFixed(1);
+        animationTag = `<animateTransform attributeName="transform" type="translate" values="0,0; ${transX},${transY}; 0,0" dur="${dur}s" repeatCount="indefinite" additive="sum"/>`;
+      }
+
+      svg += `<path d="${d}" fill="${color}" transform="rotate(${rot}, ${cx}, ${cy})">${animationTag}</path>`;
       
       cursorX += charWidth + baseSpacing;
     }
@@ -127,9 +134,9 @@ export function buildSvg(
   for (let i = 0; i < numFgLines; i++) {
     const strokeColor = pickCamouflageColor();
     if (randInt(0, 1) === 0) {
-      svg += `<line x1="${randInt(0, width)}" y1="${randInt(0, height)}" x2="${randInt(0, width)}" y2="${randInt(0, height)}" stroke="${strokeColor}" stroke-width="${randFloat(1.5, 3).toFixed(1)}" opacity="0.85" />`;
+      svg += `<line x1="${randInt(0, width)}" y1="${randInt(0, height)}" x2="${randInt(0, width)}" y2="${randInt(0, height)}" stroke="${strokeColor}" stroke-width="${randFloat(1.5, 3).toFixed(1)}" opacity="${randFloat(0.5, 0.9).toFixed(2)}" />`;
     } else {
-      svg += `<path d="M${randInt(0, width)},${randInt(0, height)} Q${randInt(0, width)},${randInt(0, height)} ${randInt(0, width)},${randInt(0, height)}" fill="none" stroke="${strokeColor}" stroke-width="${randFloat(1.5, 3).toFixed(1)}" opacity="0.85" />`;
+      svg += `<path d="M${randInt(0, width)},${randInt(0, height)} Q${randInt(0, width)},${randInt(0, height)} ${randInt(0, width)},${randInt(0, height)}" fill="none" stroke="${strokeColor}" stroke-width="${randFloat(1.5, 3).toFixed(1)}" opacity="${randFloat(0.5, 0.9).toFixed(2)}" />`;
     }
   }
   
