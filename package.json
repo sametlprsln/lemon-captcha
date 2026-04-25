@@ -1,6 +1,6 @@
 {
   "name": "lemon-captcha",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Zero-dependency SVG CAPTCHA generation engine for Node.js, Deno, Bun, and edge runtimes",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
