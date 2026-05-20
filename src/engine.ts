@@ -8,13 +8,14 @@ import { buildSvg } from './renderer/svg';
 export function generateCaptcha(options: CaptchaOptions): CaptchaResult {
   const difficulty = options.difficulty ?? 2;
   const globalNoise = options.globalNoise ?? 2;
-  
-  setSeed(options.seed);
+  const animated = options.animated ?? (globalNoise > 3 || difficulty > 3);
+
+  const normalizedSeed = setSeed(options.seed);
 
   let resultChars: string[] = [];
   let answer: string | number;
   let question: string | undefined;
-  
+
   let width = options.width ?? 200;
   let height = options.height ?? 70;
 
@@ -36,8 +37,9 @@ export function generateCaptcha(options: CaptchaOptions): CaptchaResult {
       resultChars = logicRes.chars;
       answer = logicRes.answer;
       question = logicRes.question;
+
       if (logicRes.chars.length === 6 && !options.width) {
-        width = 280;
+        width = Math.max(width, 280);
       }
       break;
     }
@@ -45,15 +47,15 @@ export function generateCaptcha(options: CaptchaOptions): CaptchaResult {
       throw new Error(`Unsupported CAPTCHA type: ${options.type}`);
   }
 
-  const isAnimated = globalNoise > 3 || difficulty > 3;
-
-  const svgImage = buildSvg(resultChars, difficulty, globalNoise, width, height, isAnimated);
+  const svgImage = buildSvg(resultChars, difficulty, globalNoise, width, height, animated);
 
   const meta = {
     type: options.type,
     difficulty,
     globalNoise,
-    createdAt: Date.now()
+    createdAt: Date.now(),
+    animated,
+    ...(normalizedSeed ? { seed: normalizedSeed } : {})
   };
 
   return {

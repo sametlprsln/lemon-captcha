@@ -3,3 +3,5 @@ dist/
 *.tgz
 .DS_Store
 Thumbs.db
+test-output.html
+visual-test.js

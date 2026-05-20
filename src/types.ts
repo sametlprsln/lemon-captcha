@@ -8,9 +8,10 @@ export interface CaptchaOptions {
   difficulty?: Difficulty;
   globalNoise?: GlobalNoise;
   wordPool?: string[];
-  seed?: number;
+  seed?: number | string;
   width?: number;
   height?: number;
+  animated?: boolean;
 }
 
 export interface CaptchaResult {
@@ -22,5 +23,7 @@ export interface CaptchaResult {
     difficulty: Difficulty;
     globalNoise: GlobalNoise;
     createdAt: number;
+    animated: boolean;
+    seed?: string;
   };
 }

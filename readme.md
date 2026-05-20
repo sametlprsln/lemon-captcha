@@ -27,15 +27,17 @@ console.log(captcha.answer); // e.g. 5
 console.log(captcha.image);  // "data:image/svg+xml;base64,..."
 ```
 
-### Alphanumeric CAPTCHA (with Custom Dimensions & Animation)
+### Alphanumeric CAPTCHA (with Custom Dimensions & Optional Animation)
 ```typescript
-const captcha = generateCaptcha({ 
-  type: 'alpha', 
-  difficulty: 4, // > 3 triggers native SVG character animations
+const captcha = generateCaptcha({
+  type: 'alpha',
+  difficulty: 4,
+  animated: false, // optional: disable animation even when difficulty/globalNoise is high
   wordPool: ["HELLO", "WORLD"],
   width: 300,
   height: 100
 });
+
 console.log(captcha.answer); // "HELLO"
 ```
 
@@ -53,10 +55,11 @@ console.log(captcha.answer);   // "2" (e.g., if array was [1,3,2,7,9])
 |-------|------|---------|-------------|
 | `type` | `'math' \| 'alpha' \| 'logic'` | **Required** | The category of CAPTCHA. |
 | `difficulty` | `1 \| 2 \| 3 \| 4` | `2` | Module-specific difficulty. |
-| `globalNoise`| `1 \| 2 \| 3 \| 4 \| 5` | `2` | Visual distortion & noise element density. |
+| `globalNoise` | `1 \| 2 \| 3 \| 4 \| 5` | `2` | Visual distortion & noise element density. |
 | `wordPool` | `string[]` | Built-in | Custom words for Alpha difficulty 4. |
-| `seed` | `number` | undefined | Seed for deterministic SVG output (testing). |
-| `width` | `number` | `200` | Custom width for the generated SVG (Logic level 4 defaults to 280). |
+| `seed` | `number \| string` | undefined | Seed for deterministic SVG output. Supports 64-character hex strings. |
+| `animated` | `boolean` | auto | Optional animation toggle. If omitted, animation is enabled when `difficulty > 3` or `globalNoise > 3`. |
+| `width` | `number` | `200` | Custom width for the generated SVG. |
 | `height` | `number` | `70` | Custom height for the generated SVG. |
 
 ### `CaptchaResult`
@@ -64,26 +67,35 @@ console.log(captcha.answer);   // "2" (e.g., if array was [1,3,2,7,9])
 |-------|------|-------------|
 | `image` | `string` | Base64 Data URI of the generated SVG. |
 | `answer` | `string \| number` | Canonical answer for validation. |
-| `question`| `string \| undefined` | Text prompt (used by 'logic' module). |
+| `question` | `string \| undefined` | Text prompt (used by the logic module). |
 | `meta` | `Object` | Included generation metadata for backend tracking. |
+| `meta.animated` | `boolean` | Whether animation was enabled for this CAPTCHA. |
+| `meta.seed` | `string \| undefined` | Normalized seed value if provided. |
 
 ## Difficulty Matrix
 
 | Module | Level 1 | Level 2 | Level 3 | Level 4 |
 |--------|---------|---------|---------|---------|
 | **Math** | Single-digit addition (0-9) | Single-digit subtraction (>=0) | 2-digit + 1-digit addition | 2-digit subtraction (>=0) |
-| **Alpha**| 3 digits | 4 uppercase letters | 5 mixed characters | 6-char word from pool / mixed |
-| **Logic**| 1 letter among digits (4 items) | 1 digit among letters (5 items) | 1 even among odds (5 items) | 1 lowercase among uppercase (6 items)|
+| **Alpha** | 3 digits | 4 uppercase letters | 5 mixed characters | 6-char word from pool / mixed |
+| **Logic** | 1 letter among digits (4 items) | 1 digit among letters (5 items) | 1 even among odds (5 items) | 1 lowercase among uppercase (6 items) |
 
 ## Global Noise Levels
 
 | Level | Distortion | Background Lines | Foreground Lines | Dot Count | Animation |
 |-------|------------|------------------|------------------|-----------|-----------|
-| **1** | None | 0-1 | 1-2 | 20-50 | No |
-| **2** | Low | 2-3 | 2-4 | 60-100 | No |
-| **3** | Medium | 3-5 | 3-5 | 100-150 | No |
-| **4** | High | 4-6 | 4-7 | 140-200 | Yes |
-| **5** | Extreme | 5-8 | 5-9 | 180-260 | Yes |
+| **1** | None | 0-1 | 1-2 | 20-50 | Optional |
+| **2** | Low | 2-3 | 2-4 | 60-100 | Optional |
+| **3** | Medium | 3-5 | 3-5 | 100-150 | Optional |
+| **4** | High | 4-6 | 4-7 | 140-200 | Optional |
+| **5** | Extreme | 5-8 | 5-9 | 180-260 | Optional |
+
+## Seed Format
+- `seed` supports:
+  - a number
+  - a string
+  - a 64-character hex value
+- 64-character hex seeds are normalized into deterministic internal state for reproducible output.
 
 ## Roadmap
 - **v0.1.5**: Sound CAPTCHA support
